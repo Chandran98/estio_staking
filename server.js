@@ -25,6 +25,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/v0/auth", require("./routers/authRouter"));
 app.use("/api/v0/users", require("./routers/userRouter"));
+app.use("/api/v0/stake", require("./routers/stakeRouter"));
+app.use("/api/v0/transaction", require("./routers/transactionRouter"));
 
 app.all("*", (req, res) => {
     res.status(404).json({ status: 'false', message: "route not found" });

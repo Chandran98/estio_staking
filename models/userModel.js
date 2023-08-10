@@ -41,7 +41,11 @@ const userSchema = mongoose.Schema(
             type: Boolean,
             default: true,
         },
-        plan: [{
+        contract:[{
+            type:mongoose.Types.ObjectId,
+            ref:"StakingContract"
+        }],
+        level: [{
             type: String,
             enum: ["Beginner", "Intermediate", "Pro"],
             default: "Beginner",

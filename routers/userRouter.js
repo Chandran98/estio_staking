@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { updateuserById, getuserById, getAllUser,deleteuserById } = require("../controller/userContoller")
+const { updateuserById, getuserById, getAllUser, deleteuserById } = require("../controller/userContoller")
 const express = require("express");
 
 const router = express.Router();
