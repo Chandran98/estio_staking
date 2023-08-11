@@ -1,25 +1,37 @@
 const stakingPlan = require("../models/stakingPlanModel");
+const stakingContract = require("../models/stakingContractModel");
 const asyncHandler = require("express-async-handler");
+const userModel = require("../models/userModel");
 
 
 const createStakingPlan = async (req, res) => {
-    console.log(req.user.id);
+
     const user = req.user.id;
     const { name, asset, stakingPeriod, amount, apr } = req.body;
+    try {
 
-    if (!user || user === undefined || user === null) {
-        res.status(400);
-        throw new Error("Invalid User");
-    }
+        if (!user || user === undefined || user === null) {
+            res.status(201).json("Invalid User");
+        }
+        const planExist = await stakingPlan.findOne({ name });
 
-    const plan = await stakingPlan.create({ userId: user, name: name, asset: asset, stakingPeriod: stakingPeriod, amount: amount, apr: apr })
-    console.log(plan)
-    if (plan) {
-        res.status(200).json({ status: true, details: plan })
-    } else {
 
-        res.status(400);
-        throw new Error(" Failed to create a plan")
+        if (planExist) {
+            res.status(400).json("Plan already exists");
+        } else {
+            const newPlan = await stakingPlan.create({ userId: user, name: name, asset: asset, stakingPeriod: stakingPeriod, amount: amount, apr: apr })
+            console.log(newPlan)
+            if (newPlan) {
+                res.status(200).json({ status: true, details: newPlan })
+            }
+            if (!newPlan) {
+                res.status(400).json(" Failed to create a plan")
+            }
+        }
+    } catch (error) {
+        res.status(500);
+        throw new Error(error.message);
+
     }
 
 }
@@ -87,8 +99,51 @@ const deleteStakingPlan = async (req, res) => {
 
 }
 
+const stakeMyToken = async (req, res) => {
+    const { planName } = req.body;
+    const userId = req.user.id;
+    try {
+
+        const availablePlan = await stakingPlan.findOne({ name: planName });
+
+        if (!availablePlan || availablePlan == null || availablePlan === undefined) {
+            res.status(200).json({ status: false, message: "Plan not found" })
+        }
+        const myPlan = await stakingContract.create({ userId, asset: availablePlan.asset, stakingPeriod: availablePlan.stakingPeriod, amount: availablePlan.amount, apr: availablePlan.apr })
+        myPlan.save();
+
+        if (myPlan) {
+            res.status(200).json({ success: true, message: "Your plan has been created", details: myPlan });
+        }
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+
+    }
+
+}
+
+const fetchMyContract = async (req, res) => {
+    const userID = req.user.id;
+
+    try {
+        const myPlan = await stakingContract.find({ userId: userID });
+        console.log(myPlan);
+        if (myPlan) {
+
+            res.status(200).json({ success: true, details: myPlan });
+        } else {
+            res.status(400).json({ success: false, details: "You don't have any contract right now" });
+        }
+    } catch (error) {
+        res.status(500).json(error);
+
+    }
+
+
+}
 
 module.exports = {
     createStakingPlan,
-    deleteStakingPlan, getStakingPlan, getSingleStakingPlan
+    deleteStakingPlan, getStakingPlan, getSingleStakingPlan, stakeMyToken, fetchMyContract
 }

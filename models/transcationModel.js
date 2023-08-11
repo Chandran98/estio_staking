@@ -9,8 +9,8 @@ const transactionSchema = mongoose.Schema({
     transactionType: {
         type: String,
 
-        enum: ["Deposit", "Withdraw"],
-        required: true,
+        // enum: ["Deposit", "Withdraw"],
+        // required: true,
     },
 
     asset: {
@@ -21,7 +21,7 @@ const transactionSchema = mongoose.Schema({
     amount: {
         type: String,
     },
-    status: { type: String }
+    hash: { type: String }
 
 
 

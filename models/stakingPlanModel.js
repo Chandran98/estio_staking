@@ -5,7 +5,10 @@ const stakingPlan = mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: "Users"
     },
-    name: { type: String },
+    name: {
+        type: String, required: [true, "Please add plan name"],
+        unique: [true, "Please set a unique plan name"],
+    },
     asset: { type: String },
     stakingPeriod: { type: String },
     // ReleasePeriod: { type: String },

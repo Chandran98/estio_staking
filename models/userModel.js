@@ -17,7 +17,7 @@ const userSchema = mongoose.Schema(
         lastLogin: {
             type: Date,
         },
-        wallet:  {
+        wallet: {
             publicAddress: { type: String },
             privateAddress: { type: String },
         },
@@ -41,9 +41,9 @@ const userSchema = mongoose.Schema(
             type: Boolean,
             default: true,
         },
-        contract:[{
-            type:mongoose.Types.ObjectId,
-            ref:"StakingContract"
+        contract: [{
+            type: mongoose.Types.ObjectId,
+            ref: "StakingContract"
         }],
         level: [{
             type: String,
