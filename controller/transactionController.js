@@ -1,6 +1,6 @@
 const transactionModel = require("../models/transcationModel");
 const User = require("../models/userModel");
-
+const axios = require("axios");
 const crypto = require("../helpers/crypto");
 const asyncHandler = require("express-async-handler");
 
@@ -17,6 +17,7 @@ const razorpay = new Razorpay({
 const testNetRPC = "https://polygon-mumbai.infura.io/v3/4458cf4d1689497b9a38b1d6bbf05e78";
 const mainnetRPC = "https://polygon-rpc.com/";
 const polAddress = "0x0000000000000000000000000000000000001010"
+
 const depositINR = async (req, res) => {
     const amount = req.body.amount;
     const userId = req.user.id;
@@ -44,39 +45,51 @@ const depositINR = async (req, res) => {
         res.status(500).json({ status: false, message: error })
     }
 }
+
 const withdrawINR = async (req, res) => {
     console.log(req.body);
 }
 
 const convertINR2Crypto = async (req, res) => {
     const userId = req.user.id;
-    const inrAmount = req.body.amount;
+    const { amount, asset } = req.body;
+    try {
 
-    const user = await userModel.findById(userId);
+        const user = await userModel.findById(userId);
 
-    if (!user || user === undefined || user == null) {
-        res.status(404);
-        throw new Error("User not found");
-    }
-    if (parseInt(user.balanceINR) >= parseInt(inrAmount)) {
-        const cryptValue = 56;
-        const cryptBalance = (inrAmount / cryptValue).toFixed(2)
-        const cryptoBalance =  +user.balance + +cryptBalance ;
+        if (!user || user === undefined || user == null) {
+            res.status(404);
+            throw new Error("User not found");
+
+        }
+        // let coin =["MATIC"] 
+        // const url = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC&tsyms=USD&api_key=${process.env.CRYPTO_COMPARE_API_KEY}`;
+        // const url = "https://bxnzaopdi.kairaaexchange.com/restapi/markets?market_pair=MATIC_INR"
+        //         const data = await axios.get(url);
+        //         console.log(data);
+        if (parseInt(user.balanceINR) >= parseInt(amount)) {
+
+            const cryptValue = 56;
+            const cryptBalance = (amount / cryptValue).toFixed(2);
+            const cryptoBalance = (+user.balance + +cryptBalance).toFixed(2);
 
 
-        const inrBalance = user.balanceINR - inrAmount;
-        console.log(`convert ${cryptoBalance}`)
+            const inrBalance = user.balanceINR - amount;
+            console.log(`convert ${cryptoBalance}`)
 
-        await userModel.findByIdAndUpdate({ _id: userId }, { balanceINR: inrBalance, balance: cryptoBalance })
+            await userModel.findByIdAndUpdate({ _id: userId }, { balanceINR: inrBalance, balance: cryptoBalance })
+            await transactionModel.create({ userId, transactionType: "swap", asset: asset, amount: amount, hash: "" })
 
-        res.status(201).json({ status: true, message: `You have convert ${inrAmount} INR into ${cryptBalance} MATIC complete` },
-        );
-    } else {
-        res.status(201).json({ status: false, message: "You don't have sufficient balance to complete" });
+            res.status(201).json({ status: true, message: `You have convert ${amount} INR into ${cryptBalance} MATIC complete` },
+            );
+        } else {
+            res.status(201).json({ status: false, message: "You don't have sufficient balance to complete" });
+        }
+    } catch (error) {
+        res.status(500).json({ status: false, message: error.message });
     }
 
 }
-
 
 const getBalance = async (req, res) => {
     const address = req.body.address;
@@ -146,7 +159,11 @@ const getTransactionHistory = async (req, res) => {
 
 
     try {
-        const history = await transactionModel.find({});
+        const query = {};
+
+        if (req.query.userId) query.userId = req.query.userId;
+        if (req.query.amount) query.amount = req.query.amount;
+        const history = await transactionModel.find(query);
         console.log(history);
         res.status(200).json({ status: true, details: history });
 
