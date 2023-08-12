@@ -12,7 +12,14 @@ const userSchema = mongoose.Schema(
             unique: [true, "Please add a valid email"],
         },
         profilePhoto: {
-            type: String,
+            type: String, default: ""
+        },
+        balance: {
+            type: String, default: 0
+        }, balanceINR: {
+            type: String, default: 0
+        }, stakedAmount: {
+            type: String, default: 0
         },
         lastLogin: {
             type: Date,

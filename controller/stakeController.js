@@ -109,19 +109,39 @@ const stakeMyToken = async (req, res) => {
         if (!availablePlan || availablePlan == null || availablePlan === undefined) {
             res.status(200).json({ status: false, message: "Plan not found" })
         }
-        const myPlan = await stakingContract.create({ userId, asset: availablePlan.asset, stakingPeriod: availablePlan.stakingPeriod, amount: availablePlan.amount, apr: availablePlan.apr })
-        myPlan.save();
-
-        if (myPlan) {
-            res.status(200).json({ success: true, message: "Your plan has been created", details: myPlan });
+        const user = await userModel.findById({ _id: userId });
+        console.log(user);
+        if (!user || user == null || user === undefined) {
+            res.status(400).json({ status: false, message: "User not found" })
         }
 
+        if (user.balance < availablePlan.amount) {
+            res.status(400);
+            throw new Error("User has low balance")
+        } else {
+            const deductedBalance = user.balance - availablePlan.amount;
+            const stakedBalance = +user.stakedAmount + +availablePlan.amount;
+            const myPlan = await stakingContract.create({ userId, asset: availablePlan.asset, stakingPeriod: availablePlan.stakingPeriod, amount: availablePlan.amount, apr: availablePlan.apr, createdAt: Date.now() })
+            myPlan.save();
+            await userModel.findByIdAndUpdate({ _id: userId }, { balance: deductedBalance, $push: { contract: myPlan.id }, stakedAmount: stakedBalance },)
+            // const dataPopulate = await user.populate("StakingContract");
+            // console.log(dataPopulate);
+            if (myPlan) {
+                res.status(200).json({ success: true, message: "Your plan has been created", details: myPlan });
+            }
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
 
     }
 
 }
+
+// const rewardToken = async(req,res)=>{
+//     const 
+// }
+
+
 
 const fetchMyContract = async (req, res) => {
     const userID = req.user.id;
@@ -145,5 +165,9 @@ const fetchMyContract = async (req, res) => {
 
 module.exports = {
     createStakingPlan,
-    deleteStakingPlan, getStakingPlan, getSingleStakingPlan, stakeMyToken, fetchMyContract
+    deleteStakingPlan,
+    getStakingPlan,
+    getSingleStakingPlan,
+    stakeMyToken,
+    fetchMyContract
 }

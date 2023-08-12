@@ -8,6 +8,7 @@ const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 
 // Register handlers
+
 const signUpRequest = asyncHandler(async (req, res) => {
     console.log("sdf");
     const { name, email, phone, password } = req.body;
@@ -58,6 +59,7 @@ const signUpRequest = asyncHandler(async (req, res) => {
 });
 
 // Login handlers
+
 const signInRequest = asyncHandler(async (req, res) => {
     console.log(req.headers);
     console.log(req.header);
@@ -100,8 +102,6 @@ const signInRequest = asyncHandler(async (req, res) => {
         token: accessToken,
     });
 });
-
-
 
 // const sendLoginOtp = asyncHandler(async (req, res) => {
 //     console.log(req.body);

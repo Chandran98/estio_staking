@@ -10,6 +10,8 @@ const stakingContract = mongoose.Schema({
     // ReleasePeriod: { type: String },
     amount: { type: String },
     apr: { type: String },
+    
+    // status: { type: String },
     createdAt: { type:  Date }
 })
 

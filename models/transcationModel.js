@@ -8,23 +8,15 @@ const transactionSchema = mongoose.Schema({
     },
     transactionType: {
         type: String,
-
-        // enum: ["Deposit", "Withdraw"],
-        // required: true,
     },
 
     asset: {
-        type: String,
-    }, amount: {
         type: String,
     },
     amount: {
         type: String,
     },
     hash: { type: String }
-
-
-
 }, { timestamp: true })
 
 module.exports = mongoose.model("EST_Transaction", transactionSchema);
