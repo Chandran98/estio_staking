@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const {
     createStakingPlan,
-    deleteStakingPlan, getStakingPlan, getSingleStakingPlan, stakeMyToken,fetchMyContract,
+    deleteStakingPlan, getStakingPlan, getSingleStakingPlan, stakeMyToken, fetchMyContract, rewardToken, sendMailer
 } = require("../controller/stakeController");
 const express = require("express");
 const { validateToken } = require("../middleware/tokenValidation");
@@ -15,7 +15,8 @@ router.route("/getStakingPlan").post(getStakingPlan);
 router.route("/getSingleStakingPlan").post(getSingleStakingPlan);
 router.route("/stakeMyToken").post(stakeMyToken);
 router.route("/fetchMyContract").post(fetchMyContract);
-// router.route("/removeContract").post(removeContract);
+router.route("/rewardToken").post(rewardToken);
+router.route("/sendMailer").post(sendMailer);
 
 
 module.exports = router;

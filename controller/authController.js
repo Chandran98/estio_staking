@@ -1,43 +1,46 @@
 const asyncHandler = require("express-async-handler");
 
 const crypto = require("../helpers/crypto");
+const helper = require("../helpers/helpers")
 
-const { generateToken } = require("../helpers/validateToken");
+const { generateToken } = require("../helpers/helpers");
 const { ethers, makeError } = require("ethers");
 const User = require("../models/userModel");
+const adminModel = require("../models/admin_model");
 const bcrypt = require("bcryptjs");
 
 // Register handlers
 
 const signUpRequest = asyncHandler(async (req, res) => {
-    console.log("sdf");
-    const { name, email, phone, password } = req.body;
-    console.log(req.body);
+
+    const { name, email, phone, password, referredBy } = req.body;
 
     if (!name || !email || !password) {
         res.status(400);
         throw new Error("Please enter all fields");
     }
-    console.log("dssasad");
     const userAvailable = await User.findOne({ email });
-    console.log("dsd");
 
     if (userAvailable) {
         res.status(400);
         throw new Error("User already exists");
     }
-    console.log("ddsdssd");
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
 
+
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const referralCode = helper.referral();
+    const appId = helper.appId();
+    console.log(`appId ${appId}`)
     const wallet = ethers.Wallet.createRandom();
     const publicAddress = crypto.encrypt(wallet.address);
     const privateAddress = crypto.encrypt(wallet.privateKey);
-
-    console.log(`${publicAddress} ${privateAddress}`);
     const user = await User.create({
         name,
         email,
+        referralCode: referralCode,
+        referredBy: referredBy,
+        appId: appId,
         wallet: {
             publicAddress,
             privateAddress,
@@ -152,7 +155,41 @@ const signInRequest = asyncHandler(async (req, res) => {
 //       res.status(200).json({ message: "Invalid otp or expired" });
 //     }
 //   });
+// name: { type: String },
+// email: { type: String },
+// password: { type: String },
+// type: { type: String },
+// phone: { type: String },
+
+
+const adminSignUpRequest = async (req, res) => {
+    const { name, email, password } = req.body;
+
+    try {
+        if (!name || !email || !password) return res.status(403).json({ status: false, message: "All fields must be provided" });
+        const adminExist = await adminModel.findOne({ email })
+        if (adminExist) {
+            res.status(400);
+            throw new Error("Admin already exists");
+        } else {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const admin = await adminModel.create({ name, email, hashedPassword });
+
+            res.status(200).json({ status: true, message: "Created successfully", details: admin });
+
+        }
+    } catch (error) {
+
+        res.status(400).json({ message: error.message });
+        // throw Error();
+
+    }
 
 
 
-module.exports = { signUpRequest, signInRequest,  }
+}
+
+module.exports = {
+    signUpRequest, signInRequest, adminSignUpRequest,
+    // adminSignInRequest
+}

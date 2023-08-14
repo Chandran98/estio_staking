@@ -2,6 +2,7 @@ const stakingPlan = require("../models/stakingPlanModel");
 const stakingContract = require("../models/stakingContractModel");
 const asyncHandler = require("express-async-handler");
 const userModel = require("../models/userModel");
+const nodemailer = require("nodemailer");
 
 
 const createStakingPlan = async (req, res) => {
@@ -137,9 +138,20 @@ const stakeMyToken = async (req, res) => {
 
 }
 
-// const rewardToken = async(req,res)=>{
-//     const 
-// }
+const rewardToken = async (req, res) => {
+    const userId = req.user.id;
+
+    // res.status(200).json({ userId });
+    const user = await userModel.findById({ _id: userId })
+
+    const userContract = user.contract;
+    //    userContract.forEach(element => {
+    //        (element)
+    //     });
+    //       console.log(`adfasfa ${data}`)
+    // const uC=userContract.map((e)=>e.apr);
+    res.status(200).json({ contract: (user.contract) });
+}
 
 
 
@@ -163,11 +175,42 @@ const fetchMyContract = async (req, res) => {
 
 }
 
+
+const sendMailer = async (req, res) => {
+    const transporter = nodemailer.createTransport({
+        port: 587,
+        host: "smtp-relay.brevo.com",
+        // service: "SendinBlue",
+        auth: {
+            user: 'chandran18@gmail.com',
+            pass: '161198@Jc',
+        }, tls: {
+            ciphers: 'SSLv3' // You can try other versions like 'TLSv1.2' or 'TLSv1.3'
+        }, secureConnection: false,
+        secure: true,
+    });
+    const mailData = {
+        from: 'chandran18@gmail.com',
+        to: 'chandran16@gmail.com',
+        subject: 'Sending Email using Node.js',
+        text: 'That was easy!',
+        html: '<b>Hey there! </b>                     <br> This is our first message sent with Nodemailer<br/>',
+    };
+    transporter.sendMail(mailData, function (err, info) {
+        if (err)
+            console.log(err)
+        res.status(200).json({ status: true, message: info });
+    });
+
+
+}
+
+
 module.exports = {
     createStakingPlan,
     deleteStakingPlan,
     getStakingPlan,
     getSingleStakingPlan,
     stakeMyToken,
-    fetchMyContract
+    fetchMyContract, rewardToken,sendMailer
 }
