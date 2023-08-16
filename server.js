@@ -6,7 +6,8 @@ const morgan = require('morgan');
 const connetDb = require("./config/dbConfig");
 const dotenv = require("dotenv").config();
 const socket = require('socket.io');
-const errorHandler = require("./middleware/error")
+const errorHandler = require("./middleware/error");
+// const { testCode } = require('./middleware/testMiddleware');
 
 
 connetDb();
@@ -20,7 +21,9 @@ app.use(cors());
 
 
 app.get("/", (req, res) => {
+    console.log("started");
     res.status(200).json({ status: 'true', message: "api is working properly" })
+    console.log("api is working properly");
 })
 
 app.use("/api/v0/auth", require("./routers/authRouter"));

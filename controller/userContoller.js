@@ -1,7 +1,14 @@
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
+const AWS = require('aws-sdk');
 
+AWS.config.update({
+    accessKeyId: process.env.S3_KEY,
+    secretAccessKey: process.env.S3_SECRET_KEY,
+    region: "us-east-1"
+})
 
+const s3 = new AWS.S3();
 
 const getAllUser = asyncHandler(async (req, res) => {
     const user = await User.find({});
@@ -76,4 +83,29 @@ const deleteuserById = asyncHandler(async (req, res) => {
     res.status(200).json({ message: "success", details: `${user.name} profile has been deleted` });
 });
 
-module.exports = { updateuserById, getuserById, getAllUser, deleteuserById }
+
+
+const uploadImage = async (req, res) => {
+    if (!req.file) {
+        res.status(200).json({ message: "No file was uploaded" });
+    }
+    const params = {
+        Bucket: "estiostaking",
+        Key: req.file.originalname,
+        Body: req.file.buffer,
+        ACL: 'public-read'
+    }
+    s3.upload(params, (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error uploading to S3.');
+        }
+        res.send({ status: true, data: data.Location, message: 'File uploaded successfully', type: data.key.split('.')[1] })
+
+    })
+}
+
+
+
+
+module.exports = { updateuserById, getuserById, getAllUser, deleteuserById ,uploadImage}

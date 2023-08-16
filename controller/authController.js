@@ -1,13 +1,21 @@
 const asyncHandler = require("express-async-handler");
-
+const AWS = require('aws-sdk');
 const crypto = require("../helpers/crypto");
 const helper = require("../helpers/helpers")
-
+const multer = require('multer');
 const { generateToken } = require("../helpers/helpers");
 const { ethers, makeError } = require("ethers");
 const User = require("../models/userModel");
 const adminModel = require("../models/admin_model");
 const bcrypt = require("bcryptjs");
+
+AWS.config.update({
+    accessKeyId: process.env.S3_KEY,
+    secretAccessKey: process.env.S3_SECRET_KEY,
+    region: 'us-east-1'
+})
+
+const s3 = new AWS.S3();
 
 // Register handlers
 
@@ -189,7 +197,31 @@ const adminSignUpRequest = async (req, res) => {
 
 }
 
+
+
+
+// const uploadImage = async (req, res) => {
+//     if (!req.file) {
+//         return res.status(400).send('No file uploaded.');
+//     }
+//     const params = {
+//         Bucket: "estiostaking",
+//         Key: req.file.originalname,
+//         Body: req.file.buffer,
+//         ACL: 'public-read'
+//     }
+//     s3.upload(params, (err, data) => {
+//         if (err) {
+//             console.error(err);
+//             return res.status(500).send('Error uploading to S3.');
+//         }
+//         res.send({ status: true, data: data.Location, message: 'File uploaded successfully', type: data.key.split('.')[1] })
+
+//     })
+
+// }
+
 module.exports = {
-    signUpRequest, signInRequest, adminSignUpRequest,
+    signUpRequest, signInRequest, adminSignUpRequest, 
     // adminSignInRequest
 }
