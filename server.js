@@ -25,6 +25,9 @@ app.get("/", (req, res) => {
     res.status(200).json({ status: 'true', message: "api is working properly" })
     console.log("api is working properly");
 })
+app.get("/api/aws", (req, res) => {
+    res.status(200).json({ status: 'true', message: "api is working properly" })
+})
 
 app.use("/api/v0/auth", require("./routers/authRouter"));
 app.use("/api/v0/users", require("./routers/userRouter"));
