@@ -104,7 +104,7 @@ const getBalance = async (req, res) => {
 
         // const balance = await getAddress.balanceOf("0xB96EBb2B4E9f13099097221C9E7172389d55A6A5");
 
-        const balance = await getAddress.balanceOf(userAddress);
+        const balance = await getAddress. balanceOf(userAddress);
         const bal = ethers.formatEther(balance)
 
         res.status(200).json({ status: true, details: `My ${userAddress} balance ${bal}` })

@@ -108,4 +108,4 @@ const uploadImage = async (req, res) => {
 
 
 
-module.exports = { updateuserById, getuserById, getAllUser, deleteuserById ,uploadImage}
+module.exports = { updateuserById, getuserById, getAllUser, deleteuserById, uploadImage }

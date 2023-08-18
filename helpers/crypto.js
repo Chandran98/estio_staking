@@ -7,6 +7,7 @@ const CryptoJS = require("crypto-js");
 let key = CryptoJS.SHA256("#AyIruSmKYtAdrEEK845845JGJk854284457#");
 let iv = CryptoJS.SHA256("#AyIruSmKYdfgdgtAdrEEEncDddfdgfgdfgdgdfgeciV#");
 
+
 // var key_data = "##DISGHDIYSGIYgidfi8ygo##",
 //   iv_data = "##DISGHDIYSGIojfng##";
 function aesEncrypt(content) {
