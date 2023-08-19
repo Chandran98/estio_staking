@@ -8,7 +8,7 @@ const { ethers, makeError } = require("ethers");
 const User = require("../models/userModel");
 const adminModel = require("../models/admin_model");
 const bcrypt = require("bcryptjs");
-
+const { sendMail } = require("../helpers/mailer")
 AWS.config.update({
     accessKeyId: process.env.S3_KEY,
     secretAccessKey: process.env.S3_SECRET_KEY,
@@ -39,7 +39,6 @@ const signUpRequest = asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const referralCode = helper.referral();
     const appId = helper.appId();
-    console.log(`appId ${appId}`)
     const wallet = ethers.Wallet.createRandom();
     const publicAddress = crypto.encrypt(wallet.address);
     const privateAddress = crypto.encrypt(wallet.privateKey);
@@ -58,11 +57,19 @@ const signUpRequest = asyncHandler(async (req, res) => {
     });
 
     if (user) {
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-        });
+
+        const data = sendMail(email, "Registration", "You registered successfully");
+        if (data == true)
+            res.status(200).json({
+                status: true, message: "successfully Registered", data: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                }
+            })
+        if (data == false)
+            res.status(404).json({ message: "Failed - Please try again" })
+
     } else {
         res.status(400);
         throw new Error("Invlaid user already");
@@ -197,6 +204,20 @@ const adminSignUpRequest = async (req, res) => {
 
 }
 
+const mail = async (req, res) => {
+
+    try {
+
+        const data = sendMail(req.body.to, req.body.subject, req.body.text);
+        if (data == true)
+            res.status(200).json({ message: "successfully send mail" })
+        if (data == false)
+            res.status(404).json({ message: "Failed to send mail" })
+    } catch (error) {
+        res.status(404).json({ message: "failed", err: error })
+    }
+
+}
 
 
 
@@ -222,6 +243,6 @@ const adminSignUpRequest = async (req, res) => {
 // }
 
 module.exports = {
-    signUpRequest, signInRequest, adminSignUpRequest, 
+    signUpRequest, signInRequest, adminSignUpRequest, mail
     // adminSignInRequest
 }

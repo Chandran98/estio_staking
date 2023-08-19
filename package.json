@@ -15,6 +15,7 @@
     "aws-sdk": "^2.1437.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
+    "bitcore-lib": "^10.0.5",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "cron": "^2.4.0",
@@ -27,12 +28,14 @@
     "mongoose": "^7.4.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
+    "multicoin-address-validator": "^0.5.12",
     "nodemailer": "^6.9.4",
     "nodemon": "^3.0.1",
     "razorpay": "^2.9.1",
     "ripple-keypairs": "^1.3.0",
     "ripple-lib": "^1.10.1",
     "socket.io": "^4.7.2",
-    "twilio": "^4.14.1"
+    "twilio": "^4.14.1",
+    "web3": "^4.1.0"
   }
 }
