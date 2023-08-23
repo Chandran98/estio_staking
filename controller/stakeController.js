@@ -3,6 +3,7 @@ const stakingContract = require("../models/stakingContractModel");
 const asyncHandler = require("express-async-handler");
 const userModel = require("../models/userModel");
 const nodemailer = require("nodemailer");
+const cron = require('node-cron');
 
 
 const createStakingPlan = async (req, res) => {
@@ -132,26 +133,66 @@ const stakeMyToken = async (req, res) => {
             }
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
 
     }
 
 }
 
 const rewardToken = async (req, res) => {
-    const userId = req.user.id;
+    const userId = "64d38e9cadfcf3257bf38284";
+    console.log(userId);
 
     // res.status(200).json({ userId });
-    const user = await userModel.findById({ _id: userId })
+    const user = await stakingPlan.find({ userId: "64d38e9cadfcf3257bf38284" })
 
-    const userContract = user.contract;
+    // const userContract = user.contract;
     //    userContract.forEach(element => {
     //        (element)
     //     });
-    //       console.log(`adfasfa ${data}`)
+    console.log(`adfasfa ${user}`)
     // const uC=userContract.map((e)=>e.apr);
-    res.status(200).json({ contract: (user.contract) });
+    res.status(200).json({ contract: user });
 }
+
+function calculateReward(stakedAmount, apr, daysStaked) {
+    return (stakedAmount * (apr / 365)) * daysStaked;
+}
+
+// // Schedule a job to distribute rewards every 2 days
+// cron.schedule('*/10 * * * * *', async () => {
+//     console.log("sdd cron");
+//     const users = await userModel.find().exec();
+
+//     users.forEach(async (user) => {
+//         // console.log(user._id);
+//         user.contract.forEach(async (contract) => {
+//             // if (contract === []) {
+//             //     // return console.log(`contract ${contract}`)
+//             // } else {
+//             console.log(`contract ${contract}`)
+//             const stakingPlaned = await stakingPlan.findById(contract);
+//             console.log(`stakingPlaned ${stakingPlaned}`);
+//             const daysStaked = Math.floor((Date.now() - stakingPlaned.stakingPeriod) / (1000 * 60 * 60 * 24));
+//             const reward = calculateReward(stakingPlaned.amount, stakingPlaned.apr, daysStaked);
+
+//             // Update user's reward balance for this contract
+//             user.rewardBalance += reward;
+//             console.log(reward);
+//             // Record the reward transaction
+//             // const rewardTransaction = new RewardTransaction({
+//             //     userId: user._id,
+//             //     contractId: contract._id,
+//             //     rewardAmount: reward,
+//             //     timestamp: new Date()
+//             // });
+
+//             // await Promise.all([contract.save(), rewardTransaction.save()]);
+//             // }
+//         });
+//     });
+// });
+
 
 
 
@@ -212,5 +253,5 @@ module.exports = {
     getStakingPlan,
     getSingleStakingPlan,
     stakeMyToken,
-    fetchMyContract, rewardToken,sendMailer
+    fetchMyContract, rewardToken, sendMailer
 }

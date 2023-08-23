@@ -106,6 +106,27 @@ const uploadImage = async (req, res) => {
 }
 
 
+const readImage = async (req, res) => {
+    // if (!req.file) {
+    //     res.status(200).json({ message: "No file was uploaded" });
+    // }
+    try {
+        console.log("started");
+        const params = {
+            Bucket: "kairaaexchange	",
+            Key: req.parmas.key,
+        }
+
+        const s3Object = await s3.getObject(params).promise();
+        res.set('Content-Type', s3Object.ContentType);
+        res.send(s3Object.Body);
+    } catch (e) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
 
 
-module.exports = { updateuserById, getuserById, getAllUser, deleteuserById, uploadImage }
+
+
+module.exports = { updateuserById, getuserById, getAllUser, deleteuserById, uploadImage, readImage }
