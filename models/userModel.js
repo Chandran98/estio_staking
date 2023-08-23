@@ -20,6 +20,8 @@ const userSchema = mongoose.Schema(
             type: String, default: 0
         }, stakedAmount: {
             type: String, default: 0
+        },rewardBalance: {
+            type: String, default: 0
         }, referredBy: {
             type: String,
         }, appId: {

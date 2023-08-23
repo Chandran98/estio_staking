@@ -2,10 +2,12 @@
 
 "use strict";
 
+const { ethers, utils, BigNumber } = require("ethers");
 const CryptoJS = require("crypto-js");
 
 let key = CryptoJS.SHA256("#AyIruSmKYtAdrEEK845845JGJk854284457#");
 let iv = CryptoJS.SHA256("#AyIruSmKYdfgdgtAdrEEEncDddfdgfgdfgdgdfgeciV#");
+const validator = require('multicoin-address-validator');
 
 
 // var key_data = "##DISGHDIYSGIYgidfi8ygo##",
@@ -50,7 +52,22 @@ function _decrypt(data) {
     return bytes;
 }
 
+
+const getBalance = async (contractAddress, abi, provider, userAddress) => {
+
+    const address = new ethers.Contract(contractAddress, abi, provider)
+    console.log(address);
+    const data = await address.balanceOf(userAddress);
+    const decimals = await address.decimals();
+    const name = await address.symbol();
+    const da = ethers.formatUnits(data, decimals);
+    console.log(`sdafsaf${da}`);
+    return { da, name };
+}
+
+
 module.exports = {
+    getBalance,
     aesEncrypt: aesEncrypt,
     aesDecrypt: aesDecrypt,
     _decrypt: _decrypt,
